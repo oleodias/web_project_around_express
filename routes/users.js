@@ -15,13 +15,15 @@ function readUsers() {
     .then((data) => JSON.parse(data));
 }
 
-router.get('/', (req, res) => {
+// O catch não responde: passa o erro ao tratador central do app.js, que
+// monta a resposta 500. Assim a mensagem de erro fica num lugar só.
+router.get('/', (req, res, next) => {
   readUsers()
     .then((users) => res.send(users))
-    .catch(() => res.status(500).send({ message: 'Ocorreu um erro no servidor' }));
+    .catch((error) => next(error));
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res, next) => {
   readUsers()
     .then((users) => {
       // Procura pelo _id. Usar o parâmetro como índice do array deixaria
@@ -35,7 +37,7 @@ router.get('/:id', (req, res) => {
 
       res.send(user);
     })
-    .catch(() => res.status(500).send({ message: 'Ocorreu um erro no servidor' }));
+    .catch((error) => next(error));
 });
 
 module.exports = router;
