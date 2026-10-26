@@ -44,7 +44,8 @@ requisições inválidas e não deixa erros no console.
 - **Promessas** com `.then()` / `.catch()`: um arquivo ausente ou um JSON
   quebrado viram resposta `500`, nunca uma exceção sem tratamento
 - **Middlewares** no fim da fila: um para o `404` geral e um **tratador de
-  erros** (quatro parâmetros) que responde em JSON
+  erros central** (quatro parâmetros) que responde em JSON. As rotas não
+  montam a resposta de erro: passam o erro adiante com `next(error)`
 - Busca do usuário por `_id` com `Array.prototype.find`
 - **nodemon** para a recarga automática em desenvolvimento
 - **ESLint 8.56** com o guia de estilo **Airbnb** (`airbnb-base`), com uma
