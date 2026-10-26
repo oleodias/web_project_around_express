@@ -14,10 +14,10 @@ app.use((req, res) => {
   res.status(404).send({ message: 'A solicitação não foi encontrada' });
 });
 
-// Tratador de erros: o Express o reconhece pelos QUATRO parâmetros, por isso
-// o next fica na assinatura mesmo sem uso. Sem ele, um endereço malformado
-// como /users/%E0 receberia uma página HTML de erro e deixaria o stack no
-// console.
+// Tratador de erros central: o Express o reconhece pelos QUATRO parâmetros,
+// por isso o next fica na assinatura mesmo sem uso. Chegam aqui os erros que
+// as rotas passam com next(error) (arquivo ilegível, JSON quebrado → 500) e
+// os do próprio Express, como um endereço malformado (/users/%E0 → 400).
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const { status = 500 } = err;
