@@ -1,81 +1,100 @@
-# 🌍 Around The U.S. — API com Express
+# 🌍 Around The U.S. — API REST com MongoDB
 
 ## 📝 Descrição do Projeto
 
 **Around The U.S.** é a galeria de lugares construída nas Sprints 8 a 14 do
-curso de Desenvolvimento Web da TripleTen Brasil. Até aqui, o front-end
-conversava com o servidor da TripleTen. Este repositório é o começo do
-**próprio back-end** do projeto: um servidor Node.js com Express que entrega
-os usuários e os cartões em JSON.
+curso de Desenvolvimento Web da TripleTen Brasil. Este repositório é o
+**back-end** do projeto: uma API REST em Node.js e Express, com os usuários e
+os cartões guardados no **MongoDB**.
 
-Nesta primeira etapa, os dados vêm de arquivos JSON na pasta `data`. O banco de
-dados entra na próxima sprint, e o front-end ainda não está ligado a este
-servidor.
+Na Sprint 15, os dados vinham de arquivos JSON. Agora vêm do banco `aroundb`:
+dá para criar usuários e cartões, editar o perfil e o avatar, curtir,
+descurtir e excluir cartões.
 
-![Requisições à API: um usuário encontrado, um id inexistente e um endereço inexistente](images/api-demo.png)
+A autorização ainda é **temporária**: um middleware no `app.js` faz todas as
+requisições agirem como um usuário de teste. A autenticação de verdade vem na
+próxima sprint.
 
 ---
 
-## 🚩 Funcionalidades
+## 🚩 Rotas
 
-| Requisição | Resposta |
-| --- | --- |
-| `GET /users` | `200` — a lista de usuários de `data/users.json` |
-| `GET /cards` | `200` — a lista de cartões de `data/cards.json` |
-| `GET /users/:id` | `200` — o usuário com esse `_id` |
-| `GET /users/:id` com um id inexistente | `404` — `{ "message": "ID do usuário não encontrado" }` |
-| qualquer outro endereço, inclusive `/` | `404` — `{ "message": "A solicitação não foi encontrada" }` |
-| endereço malformado (ex.: `/users/%E0`) | `400` — `{ "message": "Requisição inválida" }` |
-| falha ao ler ou interpretar um arquivo de dados | `500` — `{ "message": "Ocorreu um erro no servidor" }` |
+| Requisição | O que faz | Sucesso |
+| --- | --- | --- |
+| `GET /users` | todos os usuários | `200` |
+| `GET /users/:userId` | um usuário pelo `_id` | `200` |
+| `POST /users` | cria um usuário (`name`, `about`, `avatar`) | `201` |
+| `PATCH /users/me` | atualiza `name` e `about` | `200` |
+| `PATCH /users/me/avatar` | atualiza o `avatar` | `200` |
+| `GET /cards` | todos os cartões | `200` |
+| `POST /cards` | cria um cartão (`name`, `link`); o `owner` é o usuário atual | `201` |
+| `DELETE /cards/:cardId` | exclui um cartão | `200` |
+| `PUT /cards/:cardId/likes` | curte | `200` |
+| `DELETE /cards/:cardId/likes` | descurte | `200` |
 
-Toda resposta de erro tem só o campo `message`. O servidor não cai com
-requisições inválidas e não deixa erros no console.
+### Erros
+
+Toda resposta de erro tem só o campo `message`.
+
+| Status | Quando | `message` |
+| --- | --- | --- |
+| `400` | dados que não passam no esquema | `Dados inválidos` |
+| `400` | id malformado (`/users/abc`) | `ID inválido` |
+| `400` | JSON ou endereço malformado | `Requisição inválida` |
+| `404` | usuário ou cartão inexistente | `Usuário não encontrado` / `Cartão não encontrado` |
+| `404` | endereço que não existe | `A solicitação não foi encontrada` |
+| `500` | qualquer outro erro | `Ocorreu um erro no servidor` |
 
 ---
 
 ## 🛠 Tecnologias e técnicas
 
-- **Node.js** e **Express 5**: rotas com `express.Router()`, uma por recurso
-  (`routes/users.js`, `routes/cards.js`), montadas no `app.js` com
-  `app.use('/users', ...)`
-- **Módulo `fs`** (`fs.promises.readFile`) para ler os arquivos de dados, e
-  **`path.join(__dirname, ...)`** para montar os caminhos, independente da
-  pasta de onde o servidor é iniciado e do sistema operacional
-- **Promessas** com `.then()` / `.catch()`: um arquivo ausente ou um JSON
-  quebrado viram resposta `500`, nunca uma exceção sem tratamento
-- **Middlewares** no fim da fila: um para o `404` geral e um **tratador de
-  erros central** (quatro parâmetros) que responde em JSON. As rotas não
-  montam a resposta de erro: passam o erro adiante com `next(error)`
-- Busca do usuário por `_id` com `Array.prototype.find`
-- **nodemon** para a recarga automática em desenvolvimento
-- **ESLint 8.56** com o guia de estilo **Airbnb** (`airbnb-base`), com uma
-  exceção para `_id`
-- **EditorConfig** e `.gitattributes` com finais de linha LF, para o lint
-  passar igual no Windows, no macOS e no Linux
+- **Node.js**, **Express 5** e **MongoDB** com o **Mongoose 8**
+- Código dividido em **modelos** (`models/`), **controladores**
+  (`controllers/`) e **rotas** (`routes/`)
+- **Esquemas com validação**: tamanhos, campos obrigatórios e uma
+  **expressão regular** para os links (`utils/validators.js`). Os updates usam
+  `{ new: true, runValidators: true }`, para devolver o documento atualizado e
+  validar também na edição
+- **Relacionamentos**: o `owner` e as `likes` do cartão guardam `ObjectId`s de
+  usuários
+- **Curtidas sem repetição** com os operadores `$addToSet` e `$pull`
+- **Tratamento de erros centralizado**: os controladores passam os erros com
+  `next(err)`, e um único tratador no `app.js` escolhe o status pelo tipo
+  (`CastError`, `ValidationError`, `NotFoundError`). Os status ficam em
+  constantes (`utils/errors.js`), e o `orFail()` transforma "não encontrado" em
+  erro 404
+- **ESLint 8.56** com o guia **Airbnb**, **EditorConfig** e **nodemon**
 
 ---
 
 ## 📐 Estrutura do Projeto
 
 ```
-├── data/
-│   ├── cards.json
-│   └── users.json
-├── images/                ← imagem do README
+├── controllers/
+│   ├── cards.js
+│   └── users.js
+├── models/
+│   ├── card.js
+│   └── user.js
 ├── routes/
 │   ├── cards.js
 │   └── users.js
+├── utils/
+│   ├── errors.js          ← status em constantes e o NotFoundError
+│   └── validators.js      ← a regex de URL
 ├── .editorconfig
 ├── .eslintrc
-├── .gitattributes
-├── .gitignore
-├── app.js                 ← ponto de entrada
+├── app.js                 ← conexão, middlewares, rotas e tratador de erros
 └── package.json
 ```
 
 ---
 
 ## 💻 Como executar localmente
+
+É preciso ter o **MongoDB** rodando em `mongodb://localhost:27017`. O banco
+`aroundb` é criado sozinho na primeira gravação.
 
 ```bash
 npm install
@@ -84,16 +103,17 @@ npm run dev     # o mesmo, reiniciando a cada arquivo salvo
 npm run lint    # ESLint
 ```
 
-Para testar as rotas, use o Postman ou o próprio navegador:
-`http://localhost:3000/users/8340d0ec33270a25f2413b69`.
+Para testar, crie um usuário com `POST /users` no Postman, coloque o `_id`
+dele no middleware temporário do `app.js` e crie os cartões com
+`POST /cards`.
 
 ---
 
 ## 📈 Próximos passos
 
-1. Guardar os dados no MongoDB, com o Mongoose
-2. Criar, editar e excluir usuários e cartões (POST, PATCH, DELETE)
-3. Ligar o front-end em React a este servidor
+1. Cadastro, login e autenticação com JWT, no lugar do usuário de teste
+2. Só o dono poder excluir o próprio cartão
+3. Ligar o front-end em React a esta API
 
 ---
 
