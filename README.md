@@ -47,7 +47,7 @@ próxima sprint.
 
 ## 🎬 Demonstração em vídeo
 
-> 🔗 **Vídeo:** _link a adicionar depois da publicação_
+> 🔗 **Vídeo:** [assistir no Google Drive](https://drive.google.com/file/d/1Hth-RUW-Irp1iZSVRREHngTPj0uXZrNf/view?usp=drive_link)
 
 Vídeo de **2min36** (1080p, 60 fps, legendas em português) com o código deste
 repositório, **sem alterações**, rodando com `npm run start` e ligado a um
