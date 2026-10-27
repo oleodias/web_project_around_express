@@ -1,5 +1,21 @@
 # 🌍 Around The U.S. — API REST com MongoDB
 
+## 📅 Sprints
+
+Projeto das **Sprints 15 e 16** do curso de Desenvolvimento Web da TripleTen
+Brasil. É o back-end do projeto cujo front-end está em
+[`web_project_around_pt`](https://github.com/oleodias/web_project_around_pt)
+(Sprints 8 a 12) e
+[`web_project_around_react`](https://github.com/oleodias/web_project_around_react)
+(Sprints 13 e 14).
+
+| Sprint | O que foi feito neste repositório |
+| --- | --- |
+| 15 | servidor Express com as rotas `/users`, `/users/:id` e `/cards` lendo arquivos JSON, ESLint e nodemon |
+| 16 | API REST com MongoDB: modelos no Mongoose, dez rotas, curtidas e erros 400 / 404 / 500 |
+
+---
+
 ## 📝 Descrição do Projeto
 
 **Around The U.S.** é a galeria de lugares construída nas Sprints 8 a 14 do
