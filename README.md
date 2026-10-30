@@ -14,6 +14,11 @@ Brasil. É o back-end do projeto cujo front-end está em
 | 15 | servidor Express com as rotas `/users`, `/users/:id` e `/cards` lendo arquivos JSON, ESLint e nodemon |
 | 16 | API REST com MongoDB: modelos no Mongoose, dez rotas, curtidas e erros 400 / 404 / 500 |
 
+Na **Sprint 18**, o projeto continua em
+[`web_project_api_full`](https://github.com/oleodias/web_project_api_full),
+que junta este código (na pasta `backend/`, agora com cadastro, login e JWT) com o front-end React do Projeto 17 e publica os dois num servidor
+com domínio e HTTPS.
+
 ---
 
 ## 📝 Descrição do Projeto
