@@ -1,5 +1,7 @@
 # 🌍 Around The U.S. — API REST com MongoDB
 
+> 🎬 **Vídeo de demonstração (2,5 min):** https://drive.google.com/file/d/1Hth-RUW-Irp1iZSVRREHngTPj0uXZrNf/view
+
 ## 📅 Sprints
 
 Projeto das **Sprints 15 e 16** do curso de Desenvolvimento Web da TripleTen
